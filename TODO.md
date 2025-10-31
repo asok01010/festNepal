@@ -1,0 +1,3 @@
+- [ ] Add try-catch blocks in AuthController.java for database operations in signup, sendOtp, and verifyOtp methods
+- [ ] Print errors to console using System.out.println
+- [ ] Return appropriate error responses (500 Internal Server Error) for database exceptions

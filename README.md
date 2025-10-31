@@ -1,9 +1,12 @@
 # festNepal
 
+
 # Start Backend
+cd backend 
 ./mvnw spring-boot:run
 
 # Start Frontend 
+cd frontend
 npm run dev 
 
 
