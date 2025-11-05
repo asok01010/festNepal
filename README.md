@@ -66,3 +66,47 @@ git log --oneline                                    # Shows commit history in s
 #  - Always work on your own branch, never push directly to main
 #  - Regularly pull latest main into your branch to avoid conflicts
 #  - Use descriptive commit messages for clarity
+
+
+<!-- 
+
+festnepal/
+│
+├── README.md
+├── .gitignore
+├── package.json             # (optional root scripts, like setup, install-all)
+│
+├── frontend/                # React (Vite) Frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/          # images, icons, etc.
+│   │   ├── components/      # reusable UI components
+│   │   ├── pages/           # page-level views (Home, Events, About, etc.)
+│   │   ├── hooks/           # custom React hooks
+│   │   ├── context/         # global state or theme context
+│   │   ├── services/        # API calls using Axios or Fetch
+│   │   ├── routes/          # route configuration
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── vite.config.js
+│   ├── package.json
+│   └── README.md
+│
+├── backend/                 # Spring Boot Backend
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/festnepal/backend/
+│   │   │   │   ├── controller/     # REST controllers (API endpoints)
+│   │   │   │   ├── service/        # Business logic
+│   │   │   │   ├── repository/     # JPA Repositories (DB interaction)
+│   │   │   │   ├── model/          # Entities / Data models
+│   │   │   │   ├── config/         # Security, CORS, and DB config
+│   │   │   │   └── BackendApplication.java
+│   │   │   └── resources/
+│   │   │       ├── application.properties  # DB, port, config
+│   │   │       └── static/ and templates/  # optional for serving static files
+│   │   └── test/
+│   │       └── java/com/festnepal/backend/ # Unit and integration tests
+│   ├── pom.xml
+│   └── README.md
+│-->
