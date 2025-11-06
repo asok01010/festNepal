@@ -68,7 +68,6 @@ git log --oneline                                    # Shows commit history in s
 #  - Use descriptive commit messages for clarity
 
 
-<!-- 
 
 festnepal/
 │
@@ -109,4 +108,4 @@ festnepal/
 │   │       └── java/com/festnepal/backend/ # Unit and integration tests
 │   ├── pom.xml
 │   └── README.md
-│-->
+│
