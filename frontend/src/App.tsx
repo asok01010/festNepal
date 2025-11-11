@@ -1,27 +1,12 @@
-<<<<<<< HEAD
-const App = () => {
-  return <div>FestNepal Dashboard</div>;
-};
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
 
-=======
-import { useState } from "react";
-import "./App.css";
-import LoginForm from "./components/LoginForm";
-import SignupForm from "./components/SignupForm";
-
-function App() {
-  const [isLogin, setIsLogin] = useState(true);
-
+export default function AppRoutes() {
   return (
-    <div className="App">
-      <div className="toggle-buttons">
-        <button onClick={() => setIsLogin(true)} className={isLogin ? 'active' : ''}>Login</button>
-        <button onClick={() => setIsLogin(false)} className={!isLogin ? 'active' : ''}>Signup</button>
-      </div>
-      {isLogin ? <LoginForm /> : <SignupForm />}
-    </div>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+    </Routes>
   );
 }
-
->>>>>>> main
-export default App;

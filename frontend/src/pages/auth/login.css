@@ -1,0 +1,130 @@
+/* Styles for the Login page — standalone so it doesn't rely on Tailwind */
+
+.auth-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-image: linear-gradient(
+      rgba(114, 111, 111, 0.6),
+      rgba(44, 44, 44, 0.6)
+    ),
+    url("../../assets/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* Keep the background fixed while scrolling */
+  background-attachment: fixed;
+}
+
+.login-card {
+  width: 480px;
+  max-width: 92vw;
+  background: #f7f3f4; /* pale pink/ivory */
+  border-radius: 14px;
+  padding: 40px 36px;
+  box-shadow: 0 18px 30px rgba(10, 10, 10, 0.12),
+    0 6px 12px rgba(10, 10, 10, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.login-avatar {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 12px auto;
+  border-radius: 50%;
+  background: #f0dfe0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.login-avatar img {
+  width: 68%;
+  height: 68%;
+  object-fit: cover;
+  filter: saturate(0.6);
+}
+
+.login-title {
+  margin: 6px 0 22px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.login-label {
+  text-align: left;
+  font-size: 13px;
+  color: #5a5a5a;
+  margin-left: 2px;
+}
+
+.login-input {
+  height: 52px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff6f7;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03) inset, 0 6px 10px rgba(0, 0, 0, 0.06);
+  font-size: 15px;
+  color: #222;
+}
+
+.login-input::placeholder {
+  color: #b7aeb0;
+}
+
+.login-button {
+  margin-top: 6px;
+  height: 52px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(180deg, #d60f36 0%, #c80d31 100%);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(198, 10, 40, 0.18);
+}
+
+.login-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #4b4b4b;
+}
+
+.login-footer a {
+  color: #b80f32;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 500px) {
+  .login-card {
+    padding: 28px 20px;
+  }
+  .login-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  .login-button {
+    font-size: 16px;
+  }
+}
