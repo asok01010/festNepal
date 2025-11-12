@@ -10,9 +10,9 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version> <!-- ✅ Stable latest version -->
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.5.7</version>
     </parent>
+
 
     <groupId>com.festnepal</groupId>
     <artifactId>backend</artifactId>
@@ -71,6 +71,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Spring Security Crypto (for BCrypt password hashing) -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
     </dependencies>
