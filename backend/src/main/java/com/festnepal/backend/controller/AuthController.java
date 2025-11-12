@@ -3,14 +3,14 @@ package com.festnepal.backend.controller;
 import org.springframework.web.bind.annotation.*;
 
 import com.festnepal.backend.model.User;
+import com.festnepal.backend.model.OTP;
 import com.festnepal.backend.repository.UserRepository;
+import com.festnepal.backend.repository.OTPRepository;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -22,13 +22,13 @@ public class AuthController {
     private UserRepository userRepository;
 
     @Autowired
+    private OTPRepository otpRepository;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Temporary in-memory OTP storage
-    private Map<String, String> otpStore = new HashMap<>();
-
     // -------------------
-    // Send OTP by email
+    // Send OTP by email (for any purpose, e.g., forgot password)
     // -------------------
     @PostMapping("/send-otp")
     public ResponseEntity<String> sendOtp(@RequestBody Map<String, String> request) {
@@ -37,25 +37,21 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Email is required");
         }
 
-        User user;
-        try {
-            user = userRepository.findByEmail(email);
-            if (user == null) {
-                return ResponseEntity.badRequest().body("User not registered");
-            }
-        } catch (Exception e) {
-            System.out.println("Database error in sendOtp: " + e.getMessage());
-            return ResponseEntity.status(500).body("Internal server error");
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("User not registered");
         }
 
         String otp = generateOtp();
-        otpStore.put(email, otp);
-        System.out.println("OTP for " + email + ": " + otp); // Replace with actual email sending logic
+        OTP otpEntity = new OTP(user, otp);
+        otpRepository.save(otpEntity);
+
+        System.out.println("OTP for " + email + ": " + otp); // Replace with email sending logic
         return ResponseEntity.ok("OTP sent (check console in dev)");
     }
 
     // -------------------
-    // Verify OTP
+    // Verify OTP (general purpose)
     // -------------------
     @PostMapping("/verify-otp")
     public ResponseEntity<String> verifyOtp(@RequestBody Map<String, String> request) {
@@ -66,21 +62,16 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Email and OTP are required");
         }
 
-        User user;
-        try {
-            user = userRepository.findByEmail(email);
-            if (user == null) {
-                return ResponseEntity.status(401).body("User not found");
-            }
-        } catch (Exception e) {
-            System.out.println("Database error in verifyOtp: " + e.getMessage());
-            return ResponseEntity.status(500).body("Internal server error");
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found");
         }
 
-        String storedOtp = otpStore.get(email);
-        if (storedOtp != null && storedOtp.equals(otp)) {
-            otpStore.remove(email);
-            return ResponseEntity.ok("Login successful");
+        OTP latestOtp = otpRepository.findTopByUserOrderByCreatedAtDesc(user).orElse(null);
+
+        if (latestOtp != null && latestOtp.getOtp().equals(otp)) {
+            otpRepository.deleteByUser(user); // remove OTP after verification
+            return ResponseEntity.ok("OTP verified successfully");
         } else {
             return ResponseEntity.status(401).body("Invalid OTP");
         }
@@ -101,7 +92,7 @@ public class AuthController {
         }
 
         try {
-            // Check if user already exists using SQL query
+            // Check if user already exists
             String checkQuery = "SELECT COUNT(*) FROM user WHERE email = ?";
             Integer count = jdbcTemplate.queryForObject(checkQuery, Integer.class, email);
             if (count != null && count > 0) {
@@ -112,7 +103,7 @@ public class AuthController {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String hashedPassword = encoder.encode(password);
 
-            // Insert user using SQL query
+            // Insert user
             String insertQuery = "INSERT INTO user (name, email, password) VALUES (?, ?, ?)";
             jdbcTemplate.update(insertQuery, name, email, hashedPassword);
 
@@ -121,7 +112,6 @@ public class AuthController {
             Long generatedId = jdbcTemplate.queryForObject(idQuery, Long.class);
 
             System.out.println("User created: id=" + generatedId + ", email=" + email);
-
             return ResponseEntity.ok("Signup successful: id=" + generatedId);
         } catch (Exception e) {
             System.out.println("Database error in signup: " + e.getMessage());
@@ -141,30 +131,26 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Email and password are required");
         }
 
-        try {
-            User user = userRepository.findByEmail(email);
-            if (user == null) {
-                return ResponseEntity.status(401).body("Invalid credentials");
-            }
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
 
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            if (encoder.matches(password, user.getPassword())) {
-                // Credentials valid, generate and send OTP
-                String otp = generateOtp();
-                otpStore.put(email, otp);
-                System.out.println("Login OTP for " + email + ": " + otp); // Print OTP to console
-                return ResponseEntity.ok("OTP sent (check console in dev)");
-            } else {
-                return ResponseEntity.status(401).body("Invalid credentials");
-            }
-        } catch (Exception e) {
-            System.out.println("Database error in login: " + e.getMessage());
-            return ResponseEntity.status(500).body("Internal server error");
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (encoder.matches(password, user.getPassword())) {
+            String otp = generateOtp();
+            OTP otpEntity = new OTP(user, otp);
+            otpRepository.save(otpEntity);
+
+            System.out.println("Login OTP for " + email + ": " + otp);
+            return ResponseEntity.ok("OTP sent (check console in dev)");
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
 
     // -------------------
-    // Verify Login OTP (Step 2: Verify OTP for login)
+    // Verify Login OTP (Step 2)
     // -------------------
     @PostMapping("/verify-login-otp")
     public ResponseEntity<String> verifyLoginOtp(@RequestBody Map<String, String> request) {
@@ -175,20 +161,15 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Email and OTP are required");
         }
 
-        User user;
-        try {
-            user = userRepository.findByEmail(email);
-            if (user == null) {
-                return ResponseEntity.status(401).body("User not found");
-            }
-        } catch (Exception e) {
-            System.out.println("Database error in verifyLoginOtp: " + e.getMessage());
-            return ResponseEntity.status(500).body("Internal server error");
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found");
         }
 
-        String storedOtp = otpStore.get(email);
-        if (storedOtp != null && storedOtp.equals(otp)) {
-            otpStore.remove(email);
+        OTP latestOtp = otpRepository.findTopByUserOrderByCreatedAtDesc(user).orElse(null);
+
+        if (latestOtp != null && latestOtp.getOtp().equals(otp)) {
+            otpRepository.deleteByUser(user); // remove OTP after successful login
             return ResponseEntity.ok("Login successful");
         } else {
             return ResponseEntity.status(401).body("Invalid OTP");

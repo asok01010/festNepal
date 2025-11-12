@@ -12,7 +12,6 @@ public class User {
     private Long id;
     private String name;
     private String email;
-    private String otp;
     private String password;
 
     // Getters and setters
@@ -48,10 +47,4 @@ public class User {
         this.password = password;
     }
 
-    public String getOtp() {
-        return otp;
-    }
-    public void setOtp(String otp) {
-        this.otp = otp;
-    }
 }
