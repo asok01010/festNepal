@@ -1,4 +1,4 @@
-package com.festnepal.backend;
+package com.festnepal.backend.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,9 +1,14 @@
-package com.festnepal.backend;
+package com.festnepal.backend.controller;
 
 import org.springframework.web.bind.annotation.*;
+
+import com.festnepal.backend.model.User;
+import com.festnepal.backend.repository.UserRepository;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +20,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     // Temporary in-memory OTP storage
     private Map<String, String> otpStore = new HashMap<>();
@@ -93,22 +101,28 @@ public class AuthController {
         }
 
         try {
-            if (userRepository.findByEmail(email) != null) {
+            // Check if user already exists using SQL query
+            String checkQuery = "SELECT COUNT(*) FROM user WHERE email = ?";
+            Integer count = jdbcTemplate.queryForObject(checkQuery, Integer.class, email);
+            if (count != null && count > 0) {
                 return ResponseEntity.badRequest().body("User with this email already exists");
             }
 
-            User user = new User();
-            user.setName(name);
-            user.setEmail(email);
-
-            // hash the password
+            // Hash the password
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            user.setPassword(encoder.encode(password));
+            String hashedPassword = encoder.encode(password);
 
-            User saved = userRepository.save(user);
-            System.out.println("User created: id=" + saved.getId() + ", email=" + email);
+            // Insert user using SQL query
+            String insertQuery = "INSERT INTO user (name, email, password) VALUES (?, ?, ?)";
+            jdbcTemplate.update(insertQuery, name, email, hashedPassword);
 
-            return ResponseEntity.ok("Signup successful: id=" + saved.getId());
+            // Retrieve the generated ID
+            String idQuery = "SELECT LAST_INSERT_ID()";
+            Long generatedId = jdbcTemplate.queryForObject(idQuery, Long.class);
+
+            System.out.println("User created: id=" + generatedId + ", email=" + email);
+
+            return ResponseEntity.ok("Signup successful: id=" + generatedId);
         } catch (Exception e) {
             System.out.println("Database error in signup: " + e.getMessage());
             return ResponseEntity.status(500).body("Internal server error");

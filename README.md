@@ -88,42 +88,146 @@ git log --oneline                                    # Shows commit history in s
 
 # Project Structure
 
-festnepal/
-│
-├── README.md
-├── .gitignore
-├── package.json             # (optional root scripts, like setup, install-all)
-│
-├── frontend/                # React (Vite) Frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── assets/          # images, icons, etc.
-│   │   ├── components/      # reusable UI components
-│   │   ├── pages/           # page-level views (Home, Events, About, etc.)
-│   │   ├── hooks/           # custom React hooks
-│   │   ├── context/         # global state or theme context
-│   │   ├── services/        # API calls using Axios or Fetch
-│   │   ├── routes/          # route configuration
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── vite.config.js
-│   ├── package.json
-│   └── README.md
-│
-├── backend/                 # Spring Boot Backend
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/festnepal/backend/
-│   │   │   │   ├── controller/     # REST controllers (API endpoints)
-│   │   │   │   ├── service/        # Business logic
-│   │   │   │   ├── repository/     # JPA Repositories (DB interaction)
-│   │   │   │   ├── model/          # Entities / Data models
-│   │   │   │   ├── config/         # Security, CORS, and DB config
-│   │   │   │   └── BackendApplication.java
-│   │   │   └── resources/
-│   │   │       ├── application.properties  # DB, port, config
-│   │   │       └── static/ and templates/  # optional for serving static files
-│   │   └── test/
-│   │       └── java/com/festnepal/backend/ # Unit and integration tests
-│   ├── pom.xml
-│   └── README.md
+
+```
+festnepal
+├─ README.md
+├─ TODO.md
+├─ backend
+│  ├─ .mvn
+│  │  └─ wrapper
+│  │     └─ maven-wrapper.properties
+│  ├─ HELP.md
+│  ├─ mvnw
+│  ├─ mvnw.cmd
+│  ├─ package-lock.json
+│  ├─ pom.xml
+│  ├─ src
+│  │  ├─ main
+│  │  │  ├─ java
+│  │  │  │  └─ com
+│  │  │  │     └─ festnepal
+│  │  │  │        └─ backend
+│  │  │  │           ├─ AuthController.java
+│  │  │  │           ├─ BackendApplication.java
+│  │  │  │           ├─ HelloController.java
+│  │  │  │           ├─ User.java
+│  │  │  │           ├─ UserRepository.java
+│  │  │  │           ├─ WebConfig.java
+│  │  │  │           ├─ config
+│  │  │  │           ├─ controller
+│  │  │  │           ├─ model
+│  │  │  │           ├─ repository
+│  │  │  │           └─ service
+│  │  │  └─ resources
+│  │  │     ├─ application.properties
+│  │  │     ├─ data.sql
+│  │  │     ├─ static
+│  │  │     └─ templates
+│  │  └─ test
+│  │     └─ java
+│  │        └─ com
+│  │           └─ festnepal
+│  │              └─ backend
+│  │                 └─ BackendApplicationTests.java
+│  └─ target
+│     ├─ classes
+│     │  ├─ application.properties
+│     │  ├─ com
+│     │  │  └─ festnepal
+│     │  │     └─ backend
+│     │  │        ├─ AuthController$LoginRequest.class
+│     │  │        ├─ AuthController$SignupRequest.class
+│     │  │        ├─ AuthController.class
+│     │  │        ├─ BackendApplication.class
+│     │  │        ├─ HelloController.class
+│     │  │        ├─ User.class
+│     │  │        ├─ UserRepository.class
+│     │  │        ├─ WebConfig$1.class
+│     │  │        ├─ WebConfig.class
+│     │  │        ├─ config
+│     │  │        ├─ controller
+│     │  │        ├─ model
+│     │  │        ├─ repository
+│     │  │        └─ service
+│     │  └─ data.sql
+│     ├─ generated-sources
+│     │  └─ annotations
+│     ├─ generated-test-sources
+│     │  └─ test-annotations
+│     ├─ maven-status
+│     │  └─ maven-compiler-plugin
+│     │     ├─ compile
+│     │     │  └─ default-compile
+│     │     │     ├─ createdFiles.lst
+│     │     │     └─ inputFiles.lst
+│     │     └─ testCompile
+│     │        └─ default-testCompile
+│     │           ├─ createdFiles.lst
+│     │           └─ inputFiles.lst
+│     ├─ surefire-reports
+│     │  ├─ TEST-com.festnepal.backend.BackendApplicationTests.xml
+│     │  └─ com.festnepal.backend.BackendApplicationTests.txt
+│     └─ test-classes
+│        └─ com
+│           └─ festnepal
+│              └─ backend
+│                 └─ BackendApplicationTests.class
+├─ frontend
+│  ├─ dist
+│  │  ├─ assets
+│  │  │  ├─ background-CMT3gyKs.jpg
+│  │  │  ├─ index-CQDFteGB.css
+│  │  │  └─ index-fV4E0HeF.js
+│  │  ├─ index.html
+│  │  └─ vite.svg
+│  ├─ eslint.config.js
+│  ├─ index.html
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ logo.png
+│  ├─ src
+│  │  ├─ App.css
+│  │  ├─ App.tsx
+│  │  ├─ assets
+│  │  │  ├─ background.jpg
+│  │  │  └─ logo.png
+│  │  ├─ components
+│  │  │  ├─ AuthLayout.tsx
+│  │  │  ├─ Input.tsx
+│  │  │  ├─ OTPModal.tsx
+│  │  │  └─ ui
+│  │  │     ├─ button.tsx
+│  │  │     ├─ dialog.tsx
+│  │  │     ├─ input-otp.tsx
+│  │  │     ├─ input.tsx
+│  │  │     └─ label.tsx
+│  │  ├─ context
+│  │  ├─ declarations.d.ts
+│  │  ├─ hooks
+│  │  ├─ index.css
+│  │  ├─ lib
+│  │  │  └─ utils.ts
+│  │  ├─ main.tsx
+│  │  ├─ pages
+│  │  │  ├─ Index.tsx
+│  │  │  ├─ NotFound.tsx
+│  │  │  └─ auth
+│  │  │     ├─ Login.tsx
+│  │  │     ├─ Signup.tsx
+│  │  │     └─ login.css
+│  │  ├─ routes
+│  │  │  └─ AppRoutes.tsx
+│  │  └─ services
+│  │     ├─ authService.js
+│  │     └─ authService.ts
+│  ├─ tsconfig.app.json
+│  ├─ tsconfig.json
+│  ├─ tsconfig.node.json
+│  ├─ tsconfig.tsbuildinfo
+│  └─ vite.config.ts
+├─ package-lock.json
+└─ package.json
+
+```
