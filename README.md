@@ -108,17 +108,21 @@ festnepal
 │  │  │  │  └─ com
 │  │  │  │     └─ festnepal
 │  │  │  │        └─ backend
-│  │  │  │           ├─ AuthController.java
 │  │  │  │           ├─ BackendApplication.java
-│  │  │  │           ├─ HelloController.java
-│  │  │  │           ├─ User.java
-│  │  │  │           ├─ UserRepository.java
-│  │  │  │           ├─ WebConfig.java
 │  │  │  │           ├─ config
+│  │  │  │           │  └─ WebConfig.java
 │  │  │  │           ├─ controller
+│  │  │  │           │  ├─ AuthController.java
+│  │  │  │           │  └─ HelloController.java
 │  │  │  │           ├─ model
+│  │  │  │           │  ├─ OTP.java
+│  │  │  │           │  └─ User.java
 │  │  │  │           ├─ repository
+│  │  │  │           │  ├─ OTPRepository.java
+│  │  │  │           │  └─ UserRepository.java
 │  │  │  │           └─ service
+│  │  │  │              ├─ EmailService.java
+│  │  │  │              └─ EmailTemplateBuilder.java
 │  │  │  └─ resources
 │  │  │     ├─ application.properties
 │  │  │     ├─ data.sql
@@ -136,20 +140,23 @@ festnepal
 │     │  ├─ com
 │     │  │  └─ festnepal
 │     │  │     └─ backend
-│     │  │        ├─ AuthController$LoginRequest.class
-│     │  │        ├─ AuthController$SignupRequest.class
-│     │  │        ├─ AuthController.class
 │     │  │        ├─ BackendApplication.class
-│     │  │        ├─ HelloController.class
-│     │  │        ├─ User.class
-│     │  │        ├─ UserRepository.class
-│     │  │        ├─ WebConfig$1.class
-│     │  │        ├─ WebConfig.class
 │     │  │        ├─ config
+│     │  │        │  └─ WebConfig.class
 │     │  │        ├─ controller
+│     │  │        │  ├─ AuthController$LoginRequest.class
+│     │  │        │  ├─ AuthController$SignupRequest.class
+│     │  │        │  ├─ AuthController.class
+│     │  │        │  └─ HelloController.class
 │     │  │        ├─ model
+│     │  │        │  ├─ OTP.class
+│     │  │        │  └─ User.class
 │     │  │        ├─ repository
+│     │  │        │  ├─ OTPRepository.class
+│     │  │        │  └─ UserRepository.class
 │     │  │        └─ service
+│     │  │           ├─ EmailService.class
+│     │  │           └─ EmailTemplateBuilder.class
 │     │  └─ data.sql
 │     ├─ generated-sources
 │     │  └─ annotations
@@ -165,9 +172,6 @@ festnepal
 │     │        └─ default-testCompile
 │     │           ├─ createdFiles.lst
 │     │           └─ inputFiles.lst
-│     ├─ surefire-reports
-│     │  ├─ TEST-com.festnepal.backend.BackendApplicationTests.xml
-│     │  └─ com.festnepal.backend.BackendApplicationTests.txt
 │     └─ test-classes
 │        └─ com
 │           └─ festnepal
@@ -211,6 +215,7 @@ festnepal
 │  │  │  └─ utils.ts
 │  │  ├─ main.tsx
 │  │  ├─ pages
+│  │  │  ├─ Home.tsx
 │  │  │  ├─ Index.tsx
 │  │  │  ├─ NotFound.tsx
 │  │  │  └─ auth
@@ -220,7 +225,6 @@ festnepal
 │  │  ├─ routes
 │  │  │  └─ AppRoutes.tsx
 │  │  └─ services
-│  │     ├─ authService.js
 │  │     └─ authService.ts
 │  ├─ tsconfig.app.json
 │  ├─ tsconfig.json
