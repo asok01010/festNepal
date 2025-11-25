@@ -1,15 +1,33 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import NotFound from "../pages/NotFound";
+import Landing from "@/pages/Landing";
+import Home from "@/pages/Home";
+import ProtectedRoute from "@/routes/ProtectedRoute";
+import Festivals from "../pages/Festivals";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      {/* Public Home (shows booking but protected when clicking Book) */}
+      <Route path="/" element={<Landing />}>
+        <Route index element={<Home />} />
+      </Route>
+
+      {/* Home route for authenticated users */}
+      <Route path="/home" element={<Landing />}>
+        <Route index element={<Home />} />
+      </Route>
+
+      {/* Auth Pages */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+
+      {/* Festivals */}
+      <Route path="/festivals" element={<Festivals />} />
+
+      {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

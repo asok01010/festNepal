@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "@/components/AuthLayout";
 import { toast } from "react-toastify";
 import OtpInput from "react-otp-input";
-import logo from "@/assets/logo.png"; // adjust path according to your project
+import logo from "@/assets/logo.png";
+import { useAuth } from "@/context/AuthContext";
 
 import "./login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -16,79 +19,127 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState<"credentials" | "otp">("credentials");
 
-  const handleCredentialsSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Load saved password (if exists)
+  useEffect(() => {
+    const savedPass = localStorage.getItem("savedPassword");
+    if (savedPass) setPassword(savedPass);
+  }, []);
+
+  // ----------- HANDLE LOGIN (SEND OTP) -----------
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!identifier || !password) {
       toast.error("Please fill in all fields");
       return;
     }
+
     setLoading(true);
-    fetch("http://localhost:8080/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: identifier, password }),
-    })
-      .then(async (res) => {
-        const text = await res.text();
-        if (res.ok) {
-          toast.success(text || "OTP sent");
-          setStep("otp");
-        } else {
-          toast.error(text || "Invalid credentials");
-        }
-      })
-      .catch((err) => {
-        console.error("Login network error:", err);
-        toast.error("Network error while signing in");
-      })
-      .finally(() => setLoading(false));
+
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: identifier, password }),
+      });
+
+      const text = await res.text();
+
+      if (res.ok) {
+        toast.success(text || "OTP sent");
+        setStep("otp");
+      } else {
+        toast.error(text || "Invalid credentials");
+      }
+    } catch {
+      toast.error("Network error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleOtpSubmit = (e: React.FormEvent) => {
+  // ----------- HANDLE OTP VERIFY -----------
+  const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!otp) {
       toast.error("Please enter OTP");
       return;
     }
+
     setLoading(true);
-    fetch("http://localhost:8080/api/auth/verify-login-otp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: identifier, otp }),
-    })
-      .then(async (res) => {
-        const text = await res.text();
-        if (res.ok) {
-          toast.success(text || "Signed in");
-          navigate("/");
-        } else {
-          toast.error(text || "Invalid OTP");
+
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/verify-login-otp", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: identifier, otp }),
+      });
+
+      const responseText = await res.text();
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        data = { message: responseText };
+      }
+
+      if (res.ok) {
+        toast.success("Login successful");
+
+        // --- SAVE PASSWORD HERE ---
+        localStorage.setItem("savedPassword", password);
+
+        // Save user data to auth context
+        const userData = {
+          email: identifier,
+          token: data.token || null, // Token might not exist if backend doesn't use JWT
+        };
+
+        if (data.token) {
+          localStorage.setItem("token", data.token);
         }
-      })
-      .catch((err) => {
-        console.error("OTP verification network error:", err);
-        toast.error("Network error while verifying OTP");
-      })
-      .finally(() => setLoading(false));
+
+        login(userData);
+
+        // Always redirect to home page after login
+        localStorage.removeItem("returnUrl"); // Clean up any stored returnUrl
+
+        // Redirect to home page after login
+        window.location.href = "/home";
+      } else {
+        toast.error(data.message || "Invalid OTP");
+      }
+
+    } catch {
+      toast.error("Network error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <AuthLayout>
       <div className="login-card">
         <div className="login-avatar">
-          <img
-            src={logo}
-            alt="logo"
-          />
+          <img src={logo} alt="logo" />
         </div>
 
         <h1 className="login-title">Sign in</h1>
 
         {step === "credentials" ? (
           <form onSubmit={handleCredentialsSubmit} className="login-form">
-            <label className="login-label" htmlFor="email">
-              Email or Username
-            </label>
+            <label className="login-label">Email or Username</label>
             <input
               id="email"
               className="login-input"
@@ -98,21 +149,18 @@ const Login = () => {
               onChange={(e) => setIdentifier(e.target.value)}
             />
 
-            <label className="login-label" htmlFor="password">
-              Password
-            </label>
+            <label className="login-label">Password</label>
             <div className="login-input-with-icon">
               <input
-                id="password"
                 className="login-input"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+
               <button
                 type="button"
-                aria-label={showPassword ? "Hide password" : "Show password"}
                 className="password-toggle"
                 onClick={() => setShowPassword((s) => !s)}
               >
@@ -126,20 +174,15 @@ const Login = () => {
           </form>
         ) : (
           <form onSubmit={handleOtpSubmit} className="login-form">
-            <label className="login-label" htmlFor="otp">
-              Enter OTP
-            </label>
+            <label className="login-label">Enter OTP</label>
+
             <OtpInput
               value={otp}
               onChange={setOtp}
               numInputs={6}
               renderSeparator={<span>-</span>}
               renderInput={(props) => (
-                <input
-                  {...props}
-                  className="otp-input"
-                  type="text"
-                />
+                <input {...props} className="otp-input" type="text" />
               )}
             />
 
