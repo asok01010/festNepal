@@ -1,5 +1,7 @@
-INSERT INTO user (name, email, password) VALUES
-('Ashok Timalsina', 'ashok@gmail.com', 'Ashok@123'),
-('Jane Smith', 'jane@example.com', 'dummy123'),
-('Alice Johnson', 'alice@example.com', 'dummy123'),
-('Bob Brown', 'bob@example.com', 'dummy123');
+INSERT INTO user (name, email, password) 
+SELECT 1, 'Ashok Timalsina', 'asok.tim010@gmail.com', 'Ashok@123'
+WHERE NOT EXISTS (SELECT 1 FROM user WHERE id = 1);
+
+
+
+

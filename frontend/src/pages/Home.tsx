@@ -1,4 +1,4 @@
-// import { Home } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const Home = () => {
   return (
@@ -48,9 +48,9 @@ const Home = () => {
             <h2>Featured Festivals</h2>
             <p>Immerse in traditional celebrations</p>
           </div>
-          <a href="Festivals.html" className="view-all">
-            View All Festivals →
-          </a>
+          <NavLink to="/festivals" className="view-festival-page">
+            <div className="view-all">View All Festivals →</div>
+          </NavLink>
         </div>
 
         <div className="cards">
@@ -82,7 +82,9 @@ const Home = () => {
             <h2>Popular Hostels</h2>
             <p>Cozy, perfect location hostels</p>
           </div>
-          <button className="view-all">View All Hostels →</button>
+          <NavLink to="/hotels" className="view-hotel-page">
+            <button className="view-all">View All Hostels →</button>
+          </NavLink>
         </div>
 
         <div className="cards">
