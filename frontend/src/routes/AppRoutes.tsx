@@ -6,6 +6,8 @@ import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import Festivals from "../pages/Festivals";
+import Hotels from "../pages/Hotels";
+import Calendar from "../pages/Calendar";
 
 export default function AppRoutes() {
   return (
@@ -27,8 +29,15 @@ export default function AppRoutes() {
       {/* Festivals */}
       <Route path="/festivals" element={<Festivals />} />
 
+      {/* Hotels */}
+      <Route path="/hotels" element={<Hotels />} />
+
+      {/* Calendar */}
+      <Route path="/calendar" element={<Calendar />} />
+
       {/* 404 */}
       <Route path="*" element={<NotFound />} />
+
     </Routes>
   );
 }

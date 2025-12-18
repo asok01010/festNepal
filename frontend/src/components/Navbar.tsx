@@ -10,13 +10,15 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Get username from email (part before @)
-  const username = user?.email?.split("@")[0] || "User";
+  // Get username: prioritize full name (first word), then email part, then "User"
+  const username = user?.name
+    ? user.name.split(" ")[0]
+    : (user?.email?.split("@")[0] || "User");
 
   const handleLogout = () => {
     logout();
     setShowDropdown(false);
-    navigate("/login");
+    navigate("/");
   };
 
   // Close dropdown when clicking outside
@@ -144,11 +146,14 @@ const Navbar = () => {
           )}
         </div>
       ) : (
-        <button className="login-btn">
-          <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
-            Login
-          </Link>
-        </button>
+        <Link
+          to="/login"
+          className="login-btn"
+          style={{ color: "white", textDecoration: "none", display: "inline-block", textAlign: "center" }}
+        >
+          Login
+        </Link>
+
       )}
     </nav>
   );

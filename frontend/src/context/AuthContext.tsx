@@ -10,8 +10,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
-  login: () => {},
-  logout: () => {},
+  login: () => { },
+  logout: () => { },
 });
 
 export const AuthProvider = ({ children }: any) => {
@@ -26,8 +26,15 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
     setUser(null);
+
+    // 🔥 Reset email + password so Chrome shows account chooser
+    sessionStorage.removeItem("identifier");
+    sessionStorage.removeItem("password");
+
+    // Also clear localStorage user data
+    localStorage.removeItem("user");
   };
 
   return (

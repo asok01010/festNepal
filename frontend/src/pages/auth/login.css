@@ -243,3 +243,36 @@
     font-size: 16px;
   }
 }
+
+/* Resend OTP Styles */
+.resend-container {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: #b80f32;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.resend-button:disabled {
+  color: #999;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.resend-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.resend-text span {
+  font-weight: 700;
+  color: #b80f32;
+}

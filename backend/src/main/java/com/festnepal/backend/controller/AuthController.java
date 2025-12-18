@@ -16,8 +16,6 @@ import com.festnepal.backend.repository.OTPRepository;
 import com.festnepal.backend.service.EmailService;
 import com.festnepal.backend.service.EmailTemplateBuilder;
 
-
-
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -57,7 +55,7 @@ public class AuthController {
         OTP otpEntity = new OTP(user, otp);
         otpRepository.save(otpEntity);
 
-       String userName = user.getName() != null ? user.getName() : "User";
+        String userName = user.getName() != null ? user.getName() : "User";
 
         try {
             String html = emailTemplateBuilder.buildOtpEmail(otp, userName);
@@ -66,7 +64,6 @@ public class AuthController {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Failed to send OTP email");
         }
-
 
         return ResponseEntity.ok("OTP sent successfully to " + email);
     }
@@ -108,7 +105,7 @@ public class AuthController {
         String password = request.getPassword();
 
         if (name == null || email == null || password == null ||
-            name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                name.isEmpty() || email.isEmpty() || password.isEmpty()) {
             return ResponseEntity.badRequest().body("All fields (name, email, password) are required");
         }
 
@@ -164,11 +161,40 @@ public class AuthController {
                 return ResponseEntity.status(500).body("Failed to send OTP email");
             }
 
-
             return ResponseEntity.ok("OTP sent successfully to " + email);
         } else {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
+    }
+
+    // -------------------
+    // Resend OTP
+    // -------------------
+    @PostMapping("/resend-otp")
+    public ResponseEntity<String> resendOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest().body("Email is required");
+        }
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        String otp = generateOtp();
+        OTP otpEntity = new OTP(user, otp);
+        otpRepository.save(otpEntity);
+
+        try {
+            String html = emailTemplateBuilder.buildOtpEmail(otp, user.getName());
+            emailService.sendHtmlEmail(email, "Your FestNepal OTP Code (Resent)", html);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Failed to send OTP email");
+        }
+
+        return ResponseEntity.ok("OTP resent successfully to " + email);
     }
 
     // -------------------
@@ -192,7 +218,7 @@ public class AuthController {
 
         if (latestOtp != null && latestOtp.getOtp().equals(otp)) {
             otpRepository.deleteByUser(user);
-            return ResponseEntity.ok("Login successful");
+            return ResponseEntity.ok("{\"message\": \"Login successful\", \"name\": \"" + user.getName() + "\"}");
         } else {
             return ResponseEntity.status(401).body("Invalid OTP");
         }
@@ -214,21 +240,49 @@ public class AuthController {
         private String email;
         private String password;
 
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 
     static class LoginRequest {
         private String email;
         private String password;
 
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }

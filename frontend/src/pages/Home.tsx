@@ -1,10 +1,53 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "@/App.css";
+import { useState } from "react";
+import SearchFilter from "../components/SearchFilter";
+
+const FEATURED_FESTIVALS = [
+  {
+    id: "dashain",
+    title: "Dashain Festival Celebration",
+    date: "Sep 15 - Oct 1",
+    duration: "15 days celebration",
+    location: "Kathmandu Valley",
+    imageClass: "festival1",
+  },
+  {
+    id: "holi",
+    title: "Holi Festival of Colors",
+    date: "Mar 25, 2026",
+    duration: "Full day event",
+    location: "Basantapur Square",
+    imageClass: "festival2",
+  },
+];
+
+const POPULAR_HOSTELS = [
+  {
+    id: "mountain-view",
+    title: "Mountain View Lodge",
+    rating: 5.0,
+    reviews: 248,
+    location: "Pokhara, Lakeside",
+    imageClass: "hostel1",
+  },
+  {
+    id: "himalayan-haven",
+    title: "Himalayan Haven Hostel",
+    rating: 4.9,
+    reviews: 189,
+    location: "Thamel, Kathmandu",
+    imageClass: "hostel2",
+  },
+];
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [filteredFestivals, setFilteredFestivals] =
+    useState(FEATURED_FESTIVALS);
+  const [filteredHostels, setFilteredHostels] = useState(POPULAR_HOSTELS);
 
   // Handle event booking with session check
   const handleBookEvent = (eventSlug: string) => {
@@ -26,6 +69,24 @@ const Home = () => {
     navigate(`/hostel/${hostelSlug}`);
   };
 
+  const handleSearch = (query: string) => {
+    const lowerQuery = query.toLowerCase();
+    setFilteredFestivals(
+      FEATURED_FESTIVALS.filter(
+        (f) =>
+          f.title.toLowerCase().includes(lowerQuery) ||
+          f.location.toLowerCase().includes(lowerQuery)
+      )
+    );
+    setFilteredHostels(
+      POPULAR_HOSTELS.filter(
+        (h) =>
+          h.title.toLowerCase().includes(lowerQuery) ||
+          h.location.toLowerCase().includes(lowerQuery)
+      )
+    );
+  };
+
   return (
     <>
       <section className="hero">
@@ -40,12 +101,11 @@ const Home = () => {
           and comfortable, memorable stays
         </p>
 
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search festivals,hotels,locations..."
+        <div className="search-bar-container" style={{ maxWidth: "600px", margin: "0 auto" }}>
+          <SearchFilter
+            onSearch={handleSearch}
+            placeholder="Search festivals, hotels, locations..."
           />
-          <button className="search-btn">Search</button>
         </div>
 
         <div className="stats">
@@ -80,41 +140,28 @@ const Home = () => {
         </div>
 
         <div className="cards">
-          {/* Dashain Festival */}
-          <div className="card">
-            <div className="card-image festival1"></div>
-            <div className="card-content">
-              <h3 className="card-title">Dashain Festival Celebration</h3>
-              <div className="card-meta">Sep 15 - Oct 1</div>
-              <div className="card-meta">⏰ 15 days celebration</div>
-              <div className="card-footer">Kathmandu Valley</div>
+          {filteredFestivals.length > 0 ? (
+            filteredFestivals.map((festival) => (
+              <div className="card" key={festival.id}>
+                <div className={`card-image ${festival.imageClass}`}></div>
+                <div className="card-content">
+                  <h3 className="card-title">{festival.title}</h3>
+                  <div className="card-meta">{festival.date}</div>
+                  <div className="card-meta">⏰ {festival.duration}</div>
+                  <div className="card-footer">{festival.location}</div>
 
-              <button
-                className="card-btn"
-                onClick={() => handleBookEvent("dashain")}
-              >
-                Book Event
-              </button>
-            </div>
-          </div>
-
-          {/* Holi Festival */}
-          <div className="card">
-            <div className="card-image festival2"></div>
-            <div className="card-content">
-              <h3 className="card-title">Holi Festival of Colors</h3>
-              <div className="card-meta">Mar 25, 2026</div>
-              <div className="card-meta">⏰ Full day event</div>
-              <div className="card-footer">Basantapur Square</div>
-
-              <button
-                className="card-btn"
-                onClick={() => handleBookEvent("holi")}
-              >
-                Book Event
-              </button>
-            </div>
-          </div>
+                  <button
+                    className="card-btn"
+                    onClick={() => handleBookEvent(festival.id)}
+                  >
+                    Book Event
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No featured festivals match your search.</p>
+          )}
         </div>
 
         {/* HOSTELS */}
@@ -127,51 +174,33 @@ const Home = () => {
         </div>
 
         <div className="cards">
-          {/* Hostel 1 */}
-          <div className="card">
-            <div className="card-image hostel1">
-              <span className="badge">⚡ FEATURED</span>
-            </div>
-            <div className="card-content">
-              <h3 className="card-title">Mountain View Lodge</h3>
-              <div className="rating">
-                <span className="stars">★★★★★</span>
-                <span>5.0</span>
-                <span className="reviews">(248 reviews)</span>
+          {filteredHostels.length > 0 ? (
+            filteredHostels.map((hostel) => (
+              <div className="card" key={hostel.id}>
+                <div className={`card-image ${hostel.imageClass}`}>
+                  <span className="badge">⚡ FEATURED</span>
+                </div>
+                <div className="card-content">
+                  <h3 className="card-title">{hostel.title}</h3>
+                  <div className="rating">
+                    <span className="stars">★★★★★</span>
+                    <span>{hostel.rating}</span>
+                    <span className="reviews">({hostel.reviews} reviews)</span>
+                  </div>
+                  <div className="card-footer">{hostel.location}</div>
+
+                  <button
+                    className="card-btn secondary"
+                    onClick={() => handleBookHostel(hostel.id)}
+                  >
+                    Book Now
+                  </button>
+                </div>
               </div>
-              <div className="card-footer">Pokhara, Lakeside</div>
-
-              <button
-                className="card-btn secondary"
-                onClick={() => handleBookHostel("mountain-view")}
-              >
-                Book Now
-              </button>
-            </div>
-          </div>
-
-          {/* Hostel 2 */}
-          <div className="card">
-            <div className="card-image hostel2">
-              <span className="badge">⚡ FEATURED</span>
-            </div>
-            <div className="card-content">
-              <h3 className="card-title">Himalayan Haven Hostel</h3>
-              <div className="rating">
-                <span className="stars">★★★★★</span>
-                <span>4.9</span>
-                <span className="reviews">(189 reviews)</span>
-              </div>
-              <div className="card-footer">Thamel, Kathmandu</div>
-
-              <button
-                className="card-btn secondary"
-                onClick={() => handleBookHostel("himalayan-haven")}
-              >
-                Book Now
-              </button>
-            </div>
-          </div>
+            ))
+          ) : (
+            <p>No popular hostels match your search.</p>
+          )}
         </div>
       </div>
     </>
